@@ -6,8 +6,11 @@ import sys
 import time
 import os
 import re
-import msvcrt as m
 import math
+try:
+    import getch as m
+except ImportError:
+    import msvcrt as m
 
 #
 # FUNCTIONS
