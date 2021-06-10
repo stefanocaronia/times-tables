@@ -1,6 +1,4 @@
 from colorama import init, Fore, Back, Style
-from random import randrange
-from colorama import init, Fore, Back, Style
 from random import randrange, seed
 import sys
 import time
