@@ -16,6 +16,7 @@ import math
 def wait():
     m.getch()
 
+#!/usr/bin/env python
 
 def delay_print(s):
     for c in s:
