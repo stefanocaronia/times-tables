@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from colorama import init, Fore, Back, Style
 from random import randrange, seed
 import sys
