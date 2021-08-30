@@ -25,7 +25,7 @@ QUESTIONS = 10
 LIVES = 3
 PRIZE = 100
 BONUS_MAX_TIME = 7
-
+PLAYER_UNKNOWN = 'Pinco Pallino'
 
 #
 # FUNCTIONS
@@ -253,13 +253,17 @@ while retry and (retry.upper()[0] == 'S' or retry.upper()[0] == 'Y'):
     last = [0, 0]
 
     records = read_records()
-    players = ', '.join(records.keys())
+    names = list(records.keys())
+
+    if PLAYER_UNKNOWN in names:
+        names.remove(PLAYER_UNKNOWN)
+    players = ', '.join(names)
     if player == '':
         player = cinput(
             "Ciao! Come ti chiami" + (" (" + players + ")" if len(players) > 0 else "") + "? ", Fore.WHITE)
 
-    if player == "":
-        player = "Pinco Pallino"
+    if player == '':
+        player = PLAYER_UNKNOWN
 
     print_records(records, player)
 
