@@ -16,16 +16,17 @@ except ImportError:
     import msvcrt as m
 
 #
-# CONSTANTS
+# CONFIGURATION
 #
 
 
-SCOREBOARD = 'scores.csv'
 QUESTIONS = 10
 LIVES = 3
 PRIZE = 100
 BONUS_MAX_TIME = 7
 PLAYER_UNKNOWN = 'Pinco Pallino'
+LOCALE = 'en'
+
 
 #
 # FUNCTIONS
@@ -69,11 +70,11 @@ def cinput(text, color):
 
 def status(score, LIVES, QUESTIONS):
     print(" ")
-    print("    - Il tuo punteggio è " + Fore.CYAN + str(score) + Fore.WHITE)
-    print("    - Hai ancora " + Fore.CYAN + str(LIVES) +
-          " vit" + ('a' if LIVES == 1 else 'e') + Fore.WHITE)
-    print("    - Ti manca" + ('' if QUESTIONS == 1 else 'no') + " " + Fore.CYAN +
-          str(QUESTIONS) + " domand" + ('a' if QUESTIONS == 1 else 'e') + Fore.WHITE)
+    print_translate("    - Your score is " + Fore.CYAN + str(score) + Fore.WHITE)
+    print_translate("    - You still have " + Fore.CYAN + str(LIVES) +
+          " live" + ('' if LIVES == 1 else 's') + Fore.WHITE)
+    print_translate("    - You are missing " + Fore.CYAN +
+          str(QUESTIONS) + " question" + ('' if QUESTIONS == 1 else 's') + Fore.WHITE)
     print(" ")
 
 
@@ -106,6 +107,20 @@ def read_records():
     return data
 
 
+def read_language(locale):
+    filename = locale + '.lang'
+    data = {}
+    if not os.path.isfile(filename):
+        return {}
+    with open(filename) as csvfile:
+        reader = csv.reader(csvfile, delimiter="=")
+        data = {}
+        for row in reader:
+            data[row[0].strip()] = row[1].strip()
+    csvfile.close()
+    return data
+
+
 def write_records(data):
     with open(SCOREBOARD, 'w') as csvfile:
         for playername in data:
@@ -122,13 +137,13 @@ def print_records(records, player):
         return
 
     print(" ")
-    print(Fore.YELLOW + "TABELLONE DEI RECORD DI " + player + Fore.WHITE)
+    print_translate(Fore.YELLOW + "SCOREBOARD OF " + player + Fore.WHITE)
     print(Fore.YELLOW + "-------------------------------------" + Fore.WHITE)
 
     player_records = records[player]
 
     for game in player_records:
-        print(Fore.CYAN + get_played_game_verbose_from_string(game) +
+        print_translate(Fore.CYAN + get_played_game_verbose_from_string(game) +
               Fore.GREEN + "\t" + str(player_records[game]) + Fore.WHITE)
     print(" ")
 
@@ -142,18 +157,35 @@ def get_played_game():
 
 def get_played_game_verbose():
     if is_numeric(single) and int(single) >= 2:
-        game = "Tabellina del " + str(single)
+        game = "Times table " + str(single)
     else:
-        game = "Tabelline fino al " + str(max)
+        game = "Times tables up to " + str(max)
 
     return game
 
 
 def get_played_game_verbose_from_string(game_string):
     if game_string[0] == '<':
-        return "Tabelline fino al " + game_string.lstrip('<=')
+        return "Times tables up to " + game_string.lstrip('<=')
     else:
-        return "Tabellina del " + game_string + "    "
+        return "Times table " + game_string + "    "
+
+
+def translate(text):
+    for key in LANGUAGE.keys():
+        text = text.replace(key, LANGUAGE[key])
+    text = text.replace('Ã¨', 'è')
+    return text
+
+
+def print_translate(text):
+    text = translate(text)
+    print(text)
+    return len(text)
+
+def cinput_translate(text, color):
+    text = translate(text)
+    return cinput(text, color)
 
 
 def endgame(score, LIVES, QUESTIONS, right_answers, wrong_answers):
@@ -179,35 +211,35 @@ def endgame(score, LIVES, QUESTIONS, right_answers, wrong_answers):
     print(" ")
     print(Fore.YELLOW + "* ----------------------------------------------------------------------------------------- *" + Fore.WHITE)
 
-    print(Fore.WHITE + "  " + player + ", hai giocato a: " +
+    print_translate(Fore.WHITE + "  " + player + ", You played: " +
           Fore.YELLOW + get_played_game_verbose() + Fore.WHITE)
 
     if LIVES == 0:
-        print(Fore.RED + "  Hai terminato le LIVES" + Fore.WHITE)
+        print_translate(Fore.RED + "  You ran out of lives" + Fore.WHITE)
     else:
-        print(Fore.WHITE + "  Hai completato il gioco!" + Fore.WHITE)
+        print_translate(Fore.WHITE + "  You have completed the game!" + Fore.WHITE)
 
-    print("  Il tuo punteggio è: " + Fore.CYAN + str(score) + Fore.WHITE)
+    print_translate("  Your score is: " + Fore.CYAN + str(score) + Fore.WHITE)
 
     if QUESTIONS == right_answers:
-        print(Fore.GREEN + "  Complimenti " + player +
-              "! hai risposto correttamente a tutte le QUESTIONS, sei un genio delle tabelline!" + Fore.WHITE)
+        print_translate(Fore.GREEN + "  Well done " + player +
+              "! You have answered all the questions correctly, you are a genius of the multiplication tables!" + Fore.WHITE)
     else:
         if right_answers > 0:
-            print(Fore.GREEN + "  Hai risposto correttamente a " +
-                  str(right_answers) + " domand" + ('a' if right_answers == 1 else 'e') + Fore.WHITE)
-        print(Fore.RED + "  Hai sbagliato " +
-              str(wrong_answers) + " domand" + ('a' if wrong_answers == 1 else 'e') + Fore.WHITE)
+            print_translate(Fore.GREEN + "  You answered correctly to " +
+                  str(right_answers) + " question" + ('' if right_answers == 1 else 's') + Fore.WHITE)
+        print_translate(Fore.RED + "  You were wrong in " +
+              str(wrong_answers) + " answer" + ('' if wrong_answers == 1 else 's') + Fore.WHITE)
 
     if old_record > 0:
-        print(Fore.WHITE + "  " + player + ", il tuo punteggio precedente era: " +
-              Fore.GREEN + str(old_record) + Fore.WHITE)
+        print_translate(Fore.WHITE + "  " + player + ", your previous score was: " +
+              Fore.CYAN + str(old_record) + Fore.WHITE)
         if score > old_record:
-            print(Fore.GREEN + "  Sei migliorato!!! " + Fore.WHITE)
+            print_translate(Fore.GREEN + "  You have improved!!! " + Fore.WHITE)
         elif score == old_record:
-            print(Fore.WHITE + "  Hai mantenuto il punteggio di prima!" + Fore.WHITE)
+            print_translate(Fore.WHITE + "  You kept the score from earlier!" + Fore.WHITE)
         elif score < old_record:
-            print(Fore.RED + "  Sei peggiorato." + Fore.WHITE)
+            print_translate(Fore.RED + "  You got worse." + Fore.WHITE)
 
     print(Fore.YELLOW + "* ----------------------------------------------------------------------------------------- *" + Fore.WHITE)
 
@@ -226,6 +258,9 @@ def screen_clear():
 
 
 init()
+LANGUAGE = read_language(LOCALE)
+
+SCOREBOARD = 'scores.csv'
 
 indent = '    '
 retry = 'S'
@@ -236,9 +271,8 @@ while retry and (retry.upper()[0] == 'S' or retry.upper()[0] == 'Y'):
     screen_clear()
 
     print(" " + Fore.CYAN)
-    print("* -------------------------- * ")
-    print("* IL GIOCO DELLE TABELLINE   * ")
-    print("* -------------------------- * ")
+    l = print_translate("* TIMETABLES GAME *")
+    print("* " + ('-' * (l - 4) )+" * ")
     print(Fore.WHITE)
 
     answers = 0
@@ -259,27 +293,25 @@ while retry and (retry.upper()[0] == 'S' or retry.upper()[0] == 'Y'):
         names.remove(PLAYER_UNKNOWN)
     players = ', '.join(names)
     if player == '':
-        player = cinput(
-            "Ciao! Come ti chiami" + (" (" + players + ")" if len(players) > 0 else "") + "? ", Fore.WHITE)
+        player = cinput_translate("Hello! Who are you" + (" (" + players + ")" if len(players) > 0 else "") + "? ", Fore.WHITE)
 
     if player == '':
         player = PLAYER_UNKNOWN
 
     print_records(records, player)
 
-    single = cinput(
-        "Con che tabellina vuoi giocare, " + player + " (invio per tutte)? ", Fore.WHITE)
+    single = cinput_translate("With which timetable do you want to play, " + player + " (return for all)? ", Fore.WHITE)
 
     if not is_numeric(single) or int(single) < 2:
-        max = cinput("Fino a quale tabellina hai studiato? ", Fore.WHITE)
+        max = cinput_translate("Up to which times table did you study (return for 9)? ", Fore.WHITE)
 
     if not is_numeric(max) or int(max) < 2:
         max = 9
 
     print(" ")
-    print(Fore.CYAN + "Iniziamo!!" + Fore.WHITE)
-    print(Fore.WHITE + "Hai " + Fore.CYAN + str(QUESTIONS) + Fore.WHITE +
-          " domande e " + Fore.CYAN + str(lives) + Fore.WHITE + " vite" + Fore.WHITE)
+    print_translate(Fore.CYAN + "Let's start!!" + Fore.WHITE)
+    print_translate(Fore.WHITE + "You have " + Fore.CYAN + str(QUESTIONS) + Fore.WHITE +
+          " questions and " + Fore.CYAN + str(lives) + Fore.WHITE + " lives" + Fore.WHITE)
     print(" ")
 
     last = [0, 0]
@@ -304,7 +336,7 @@ while retry and (retry.upper()[0] == 'S' or retry.upper()[0] == 'Y'):
 
         while answer == '':
             print(Fore.CYAN + str(answers + 1).zfill(2) + ". ", end='')
-            answer = cinput("Quanto fa " + operation + "? ", Fore.WHITE)
+            answer = cinput_translate("How much is " + operation + "? ", Fore.WHITE)
 
         result = num1 * num2
         operation = str(num1) + " x " + str(num2) + " = " + str(result)
@@ -317,31 +349,31 @@ while retry and (retry.upper()[0] == 'S' or retry.upper()[0] == 'Y'):
             prize = PRIZE + num1 * 5 + num2 * 5 + bonus
             score += prize
 
-            print(Fore.GREEN + indent + "Bravo! Il risultato è corretto! " +
+            print_translate(Fore.GREEN + indent + "Good! The result is correct! " +
                   Style.BRIGHT + operation + Fore.WHITE + Style.NORMAL)
-            print(Fore.GREEN + indent + "Hai risposto in " +
-                  str(elapsed) + " secondi " + Fore.WHITE)
-            print(Fore.GREEN + indent + "Hai ottenuto " +
-                  str(prize) + " punti " + Fore.WHITE)
+            print_translate(Fore.GREEN + indent + "You answered in " +
+                  str(elapsed) + " seconds " + Fore.WHITE)
+            print_translate(Fore.GREEN + indent + "You got " +
+                  str(prize) + " points " + Fore.WHITE)
             if bonus > 0:
-                print(Fore.YELLOW + indent + "Evviva! Hai avuto un bonus di " +
-                      str(bonus) + " punti " + Fore.WHITE)
+                print_translate(Fore.YELLOW + indent + "Hurray! You had a bonus of " +
+                      str(bonus) + " points " + Fore.WHITE)
         else:
 
             wrong_answers += 1
-            LIVES -= 1
+            lives -= 1
 
-            print(Fore.RED + indent + "Sbagliato! Il risultato corretto era " +
-                  str(result) + Fore.GREEN + "\n    Ricorda: " + Style.BRIGHT + operation + "" + Fore.WHITE + Style.NORMAL)
+            print_translate(Fore.RED + indent + "Wrong! Correct result was " +
+                  str(result) + Fore.GREEN + "\n    Remember: " + Style.BRIGHT + operation + "" + Fore.WHITE + Style.NORMAL)
 
         answers += 1
 
-        if LIVES > 0 and answers < QUESTIONS:
-            status(score, LIVES, QUESTIONS - answers)
-            print(indent + "Premi un tasto per la prossima domanda")
+        if lives > 0 and answers < QUESTIONS:
+            status(score, lives, QUESTIONS - answers)
+            print_translate(indent + "Press a key for the next question")
             wait()
             print('')
 
-    endgame(score, LIVES, QUESTIONS, right_answers, wrong_answers)
+    endgame(score, lives, QUESTIONS, right_answers, wrong_answers)
 
-    retry = cinput("Vuoi fare un'altra partita? ", Fore.WHITE)
+    retry = cinput_translate("Do you want to play another game? ", Fore.WHITE)
