@@ -1,5 +1,3 @@
-Currently only in italian
-
 ## Installation
 
 ```bash
