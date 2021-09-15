@@ -1,2 +1,6 @@
 colorama==0.4.4
 simpleaudio==1.0.4
+gtts
+playsound
+getch
+msvcrt

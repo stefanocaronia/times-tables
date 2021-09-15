@@ -8,6 +8,11 @@ import re
 import math
 import csv
 import os.path
+import subprocess
+from gtts import gTTS
+from io import BytesIO
+from playsound import playsound
+
 
 try:
     import getch as m
@@ -15,6 +20,7 @@ except ImportError:
     import msvcrt as m
 
 import vars
+
 
 #
 # FUNCTIONS
@@ -24,6 +30,16 @@ def play(wavefile):
     wave_obj = simpleaudio.WaveObject.from_wave_file(wavefile)
     play_obj = wave_obj.play()
     # play_obj.wait_done()
+
+
+def read(text):
+    text = translate(text)
+    # mp3_fp = BytesIO()
+    tts = gTTS(text, lang=vars.LOCALE)
+    filename = os.path.dirname(__file__).replace('\\','\\\\') + '\\\\voice.mp3'
+    tts.save(filename)
+    playsound(filename)
+    os.remove(filename)
 
 
 def wait():
@@ -150,6 +166,7 @@ def print_translate(text):
     print(text)
     return len(text)
 
+
 def cinput_translate(text, color):
     text = translate(text)
     return cinput(text, color)
@@ -164,11 +181,12 @@ def screen_clear():
 
 def status(score, lives, questions):
     print(" ")
-    print_translate("    - Your score is " + Fore.CYAN + str(score) + Fore.WHITE)
+    print_translate("    - Your score is " +
+                    Fore.CYAN + str(score) + Fore.WHITE)
     print_translate("    - You still have " + Fore.CYAN + str(lives) +
-          " live" + ('' if lives == 1 else 's') + Fore.WHITE)
+                    " live" + ('' if lives == 1 else 's') + Fore.WHITE)
     print_translate("    - You are missing " + Fore.CYAN +
-          str(questions) + " question" + ('' if questions == 1 else 's') + Fore.WHITE)
+                    str(questions) + " question" + ('' if questions == 1 else 's') + Fore.WHITE)
     print(" ")
 
 
@@ -184,7 +202,7 @@ def print_records(records, player):
 
     for game in player_records:
         print_translate(Fore.CYAN + get_played_game_verbose_from_string(game) +
-              Fore.GREEN + "\t" + str(player_records[game]) + Fore.WHITE)
+                        Fore.GREEN + "\t" + str(player_records[game]) + Fore.WHITE)
     print(" ")
 
 
@@ -210,30 +228,40 @@ def endgame():
 
     print(" ")
 
-    print_translate(Fore.WHITE + "You played: " + Fore.YELLOW + get_played_game_verbose() + Fore.WHITE)
-    print_translate("Your score is: " + Fore.CYAN + str(vars.score) + Fore.WHITE)
+    print_translate(Fore.WHITE + "You played: " + Fore.YELLOW +
+                    get_played_game_verbose() + Fore.WHITE)
+    print_translate("Your score is: " + Fore.CYAN +
+                    str(vars.score) + Fore.WHITE)
     if old_record > 0:
-        print_translate(Fore.WHITE + "Your previous score was: " + Fore.CYAN + str(old_record) + Fore.WHITE)
+        print_translate(Fore.WHITE + "Your previous score was: " +
+                        Fore.CYAN + str(old_record) + Fore.WHITE)
 
     if vars.lives == 0:
         print_translate(Fore.RED + "You ran out of lives" + Fore.WHITE)
     else:
-        print_translate(Fore.WHITE + "You have completed the game!" + Fore.WHITE)
+        print_translate(
+            Fore.WHITE + "You have completed the game!" + Fore.WHITE)
 
     if vars.QUESTIONS == vars.right_answers:
-        print_translate(Fore.GREEN + "Well done " + vars.player + "! You have answered all the questions correctly, you are a genius of the multiplication tables!" + Fore.WHITE)
+        print_translate(Fore.GREEN + "Well done " + vars.player +
+                        "! You have answered all the questions correctly, you are a genius of the multiplication tables!" + Fore.WHITE)
     else:
         if vars.right_answers > 0:
-            print_translate(Fore.GREEN + "You answered correctly to " + str(vars.right_answers) + " question" + ('' if vars.right_answers == 1 else 's') + Fore.WHITE)
-        print_translate(Fore.RED + "You were wrong in " + str(vars.wrong_answers) + " answer" + ('' if vars.wrong_answers == 1 else 's') + Fore.WHITE)
+            print_translate(Fore.GREEN + "You answered correctly to " + str(vars.right_answers) +
+                            " question" + ('' if vars.right_answers == 1 else 's') + Fore.WHITE)
+        print_translate(Fore.RED + "You were wrong in " + str(vars.wrong_answers) +
+                        " answer" + ('' if vars.wrong_answers == 1 else 's') + Fore.WHITE)
 
     if old_record > 0:
         if vars.score > old_record:
-            print_translate(Fore.GREEN + vars.player + ", you have improved!!! " + Fore.WHITE)
+            print_translate(Fore.GREEN + vars.player +
+                            ", you have improved!!! " + Fore.WHITE)
         elif vars.score == old_record:
-            print_translate(Fore.WHITE + vars.player + ", you kept the score from earlier!" + Fore.WHITE)
+            print_translate(Fore.WHITE + vars.player +
+                            ", you kept the score from earlier!" + Fore.WHITE)
         elif vars.score < old_record:
-            print_translate(Fore.RED + vars.player + ", you got worse." + Fore.WHITE)
+            print_translate(Fore.RED + vars.player +
+                            ", you got worse." + Fore.WHITE)
 
     print(" ")
 
