@@ -36,7 +36,10 @@ def read(text):
     text = translate(text)
     # mp3_fp = BytesIO()
     tts = gTTS(text, lang=vars.LOCALE)
-    filename = os.path.dirname(__file__).replace('\\','\\\\') + '\\\\voice.mp3'
+    if (os.path.sep == '/'):
+        filename = os.path.dirname(__file__) + '/voice.mp3'
+    else:
+        filename = os.path.dirname(__file__).replace('\\','\\\\') + '\\\\voice.mp3'
     tts.save(filename)
     playsound(filename)
     os.remove(filename)

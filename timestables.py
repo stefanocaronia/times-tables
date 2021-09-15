@@ -118,7 +118,7 @@ while retry and (retry.upper()[0] == 'S' or retry.upper()[0] == 'Y'):
             else:
                 functions.play('sounds/chimes.wav')
 
-            functions.read("Good! The result is correct! " + operation)
+            functions.read("Correct! " + operation)
             functions.read("Hurray! You had a bonus of " +
                            str(bonus) + " points ")
 
@@ -131,8 +131,7 @@ while retry and (retry.upper()[0] == 'S' or retry.upper()[0] == 'Y'):
             functions.print_translate(Fore.RED + indent + "Wrong! Correct result was " +
                                       str(result) + Fore.GREEN + "\n    Remember: " + Style.BRIGHT + operation + "" + Fore.WHITE + Style.NORMAL)
 
-            functions.read("Wrong! Correct result was " +
-                           str(result) + ', ' + operation)
+            functions.read("Wrong! Remember: " + operation)
 
         vars.answers += 1
 

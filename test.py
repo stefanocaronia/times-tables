@@ -8,4 +8,6 @@ import functions
 
 init()
 
-functions.read('ciao')
+result = 35;
+operation = "3 x 4 = 8"
+functions.read("Correct! " + operation)
