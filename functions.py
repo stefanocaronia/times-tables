@@ -69,7 +69,8 @@ def get_random_number(max):
 
 
 def get_bonus(elapsed):
-    return (math.ceil(100 / (elapsed / 2)) if elapsed > 0 else 100) if elapsed < vars.BONUS_MAX_TIME else 0
+    bonus = (math.ceil(100 / (elapsed / 4)) if elapsed > 0 else 500)
+    return bonus if elapsed < vars.BONUS_MAX_TIME else 0
 
 
 def cinput(text, color):

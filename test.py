@@ -8,6 +8,9 @@ import functions
 
 init()
 
-result = 35;
-operation = "3 x 4 = 8"
-functions.read("Correct! " + operation)
+# result = 35;
+# operation = "3 x 4 = 8"
+# functions.read("Correct! " + operation)
+
+for elapsed in range(12):
+    print(elapsed, functions.get_bonus(elapsed))
